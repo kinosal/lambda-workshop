@@ -1,0 +1,8 @@
+.DS_Store
+.venv
+.env
+*.zip
+google_account.json
+__pycache__
+.coverage
+.vscode

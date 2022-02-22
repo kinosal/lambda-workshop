@@ -1,6 +1,7 @@
 """Save data to Google Sheet."""
 
 # Import from standard library
+import os
 from typing import List, Dict
 
 # Import from 3rd party libraries
@@ -12,14 +13,15 @@ from google.oauth2.service_account import Credentials
 class GoogleSheet:
     """Google Sheet connector."""
 
-    credentials = Credentials.from_service_account_file(
-        "google_account.json",
-        scopes=["https://www.googleapis.com/auth/spreadsheets"],
-    )
-    sheets_service = build(
-        "sheets", "v4", credentials=credentials, cache_discovery=False
-    )
-    sheet_id = "1ckprgk_Y-rA0Kw7OxC_rq8T2yK6UQMQoJ58GkkAuyV0"
+    def __init__(self, sheet_id: str):
+        self.credentials = Credentials.from_service_account_file(
+            "google_account.json",
+            scopes=["https://www.googleapis.com/auth/spreadsheets"],
+        )
+        self.sheets_service = build(
+            "sheets", "v4", credentials=self.credentials, cache_discovery=False
+        )
+        self.sheet_id = sheet_id
 
     def update(self, data: List[Dict], tab_name: str) -> None:
         """Update data in Google Sheet.

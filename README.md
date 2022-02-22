@@ -8,13 +8,14 @@ Run a Python script that processes and exports data from external sources to a G
 - [Poetry](https://github.com/python-poetry/poetry) installed on local machine (e.g. via [pip](https://pypi.org/project/pip/))
 - [docker desktop](https://docs.docker.com/desktop/) installed on local machine
 - Google Cloud access to create service account
-- AWS access to push to ECR and create Lambda functions
+- AWS command line with access to to ECR and Lambda
 
 ## Workshop Steps
 
 1. Initialize new package
 ```shell
 mkdir lambda-workshop
+cd lambda-workshop
 poetry init
 git init
 ```
@@ -23,25 +24,27 @@ git init
 
 3. Create [Google Cloud](https://console.cloud.google.com/) project and service account, generate and download key as JSON file, add file to root folder as google_account.json
 
-4. Create Google Sheet, add edit permission for service account and update sheet ID in sheet.py
+4. Create Google Sheet and add edit permission for service account
 
-4. Add dependencies via Poetry
+5. Update the SYMBOL and SHEET_ID environment variables
+
+6. Add dependencies via Poetry
 ```shell
 poetry add yahooquery pandas google-api-python-client
 ```
 
-5. Test script locally
+7. Test script locally
 ```shell
 poetry run python -c "import lambda_function as lam; lam.lambda_handler()"
 ```
 
-6. Create/copy Dockerfile
+8. Create/copy Dockerfile
 
-7. Create AWS [ECR](https://eu-west-1.console.aws.amazon.com/ecr/repositories?region=eu-west-1) repository
+9. Create AWS [ECR](https://eu-west-1.console.aws.amazon.com/ecr/repositories?region=eu-west-1) repository
 
-8. Create AWS [Lambda](https://eu-west-1.console.aws.amazon.com/lambda/home?region=eu-west-1#/functions) function with "lambda-test" execution role and 5 minutes timeout
+10. Create AWS [Lambda](https://eu-west-1.console.aws.amazon.com/lambda/home?region=eu-west-1#/functions) function with "lambda-test" execution role and 5 minutes timeout
 
-9. Follow deployment steps below
+11. Follow deployment steps below
 
 ## App Readme
 
@@ -60,7 +63,7 @@ poetry run python -c "import lambda_function as lam; lam.lambda_handler()"
 
 ### Deployment (Docker)
 
-1. Authenticate with ECR (expects configured AWS CLI)
+1. Authenticate with ECR through AWS CLI
 ```shell
 aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 880172922216.dkr.ecr.eu-west-1.amazonaws.com
 ```
@@ -87,7 +90,7 @@ aws lambda update-function-code --region eu-west-1 --function-name lambda-worksh
 
 6. Set lambda environment variables (from locally sourced environment)
 ```shell
-aws lambda update-function-configuration --region eu-west-1 --function-name lambda-workshop --environment "Variables={SYMBOL=$SYMBOL}"
+aws lambda update-function-configuration --region eu-west-1 --function-name lambda-workshop --environment "Variables={SYMBOL=$SYMBOL,SHEET_ID=$SHEET_ID}"
 ```
 
 7. (Optional) Schedule cron job to trigger function execution
